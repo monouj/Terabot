@@ -8,25 +8,47 @@ from web import keep_alive
 BOT_TOKEN = "7289544815:AAHazCIKjEdiDcJb9LneDGGia-5Xpghbwl8"
 BASE_URL = "https://opabhik.serv00.net/Watch.php?url="
 TERABOX_PATTERN = r"https?://(?:\w+\.)?(terabox|1024terabox|freeterabox|teraboxapp|tera|teraboxlink|mirrorbox|nephobox|1024tera|momerybox|tibibox|terasharelink|teraboxshare|terafileshare)\.\w+"
-LOG_CHANNEL_ID = "-1001564742493"  # Replace with your actual log channel's username or chat ID
+LOG_CHANNEL_ID = "-1001583883335"  # Replace with your actual log channel's username or chat ID
+FSUB_CHANNEL_ID = "-1001940661697"  # Replace with your force subscription channel ID or username
+FSubLink = "https://t.me/+NfyWKdRHdsRhNWQ1"  # Replace with your actual channel link
+
+async def check_subscription(user_id, bot):
+    """Check if a user is a member of the required channel."""
+    try:
+        member = await bot.get_chat_member(FSUB_CHANNEL_ID, user_id)
+        print(f"User {user_id} subscription status: {member.status}")  # Debugging
+        return member.status in ["member", "administrator", "creator"]
+    except Exception as e:
+        print(f"Error in check_subscription: {e}")  # Debugging
+        return False
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Start command to welcome the user with an image and button."""
-    
-    # URL or path to the image
-    image_url = "https://envs.sh/ozm.jpg"  # Replace with the URL or local path
+    user_id = update.message.from_user.id
+    is_subscribed = await check_subscription(user_id, context.bot)
+
+    if not is_subscribed:
+        button = InlineKeyboardButton("✨ Join Channel", url=FSubLink)
+        reply_markup = InlineKeyboardMarkup([[button]])
+        await update.message.reply_text(
+            "❌ You must join our channel to use this bot.\n"
+            "Click the button below to join and then try again.",
+            reply_markup=reply_markup,
+        )
+        return
+
+    image_url = "https://envs.sh/rhi.jpg"  # Replace with the URL or local path
     
     # Button that will be displayed below the image
-    button = InlineKeyboardButton("✨ Join Channel", url="https://t.me/+Q8sRUuL-hzUwZGM1")  # Replace with your desired URL
+    button = InlineKeyboardButton("✨ Join Channel", url="https://t.me/+NfyWKdRHdsRhNWQ1")  # Replace with your desired URL
     
     # Creating an inline keyboard with the button
     reply_markup = InlineKeyboardMarkup([[button]])
 
     # Reply with image and button
     await update.message.reply_photo(
-        photo=image_url,  # Use an image URL or local file path
+        photo=image_url,
         caption="<b>👋 Hi! Welcome to the bot! Send a Terabox link, and I’ll create a stream link for you.Support Channel :- @AM_UPLOAD</b>",
-        reply_markup=reply_markup
     )
 
 async def fetch_file_details(url):
@@ -37,7 +59,7 @@ async def fetch_file_details(url):
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as response:
-                response.raise_for_status()  # Raise error for bad status
+                response.raise_for_status()
                 page_content = await response.text()
 
         soup = BeautifulSoup(page_content, "html.parser")
@@ -63,34 +85,39 @@ async def fetch_file_details(url):
 
 async def process_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Process a Terabox link, fetch details, and create a new URL with a button."""
+    user_id = update.message.from_user.id
+    is_subscribed = await check_subscription(user_id, context.bot)
+
+    if not is_subscribed:
+        button = InlineKeyboardButton("✨ Join Channel", url=FSubLink)
+        reply_markup = InlineKeyboardMarkup([[button]])
+        await update.message.reply_text(
+            "❌ You must join our channel to use this bot.\n"
+            "Click the button below to join and then try again.",
+            reply_markup=reply_markup,
+        )
+        return
+
     user_message = update.message.text.strip()
 
     if re.search(TERABOX_PATTERN, user_message):
-        # Fetch file details (ensure to await the coroutine)
         file_details = await fetch_file_details(user_message)
 
-        # Handle error if any
         if "error" in file_details:
             await update.message.reply_text(f"❌ Error fetching file details: {file_details['error']}")
             return
 
-        # Format the details
         file_name = file_details["file_name"]
         file_size = file_details["file_size"]
         thumbnail_url = file_details["thumbnail_url"]
 
-        # Truncate file name if it's too long
-        MAX_LENGTH = 100  # Adjust based on your needs
+        MAX_LENGTH = 100
         file_name = file_name[:MAX_LENGTH] + "..." if len(file_name) > MAX_LENGTH else file_name
 
-        # Create the new URL
         new_url = f"{BASE_URL}{user_message}"
-
-        # Create a button
         button = InlineKeyboardButton("🌐 Watch Online", url=new_url)
         reply_markup = InlineKeyboardMarkup([[button]])
 
-        # Format the reply text
         reply_text = (
             f"✅ **Here is your stream Link:**\n\n"
             f"📄 **File Name:** {file_name}\n\n"
@@ -98,36 +125,28 @@ async def process_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"🔗 Click the button below to open the link."
         )
 
-        # Send message with photo or just text depending on size for the user
         if thumbnail_url:
-            if len(reply_text) > 4096:
-                # If the text is too long, split it
-                await update.message.reply_text(reply_text[:4096])
-                await update.message.reply_photo(photo=thumbnail_url, caption=reply_text[4096:], reply_markup=reply_markup)
-            else:
-                await update.message.reply_photo(
-                    photo=thumbnail_url,
-                    caption=reply_text,
-                    reply_markup=reply_markup
-                )
+            await update.message.reply_photo(
+                photo=thumbnail_url,
+                caption=reply_text,
+                reply_markup=reply_markup
+            )
         else:
             await update.message.reply_text(reply_text, reply_markup=reply_markup)
 
-        # Send the same message to the log channel (exact same message with thumbnail and button)
+        # Logging to channel
         if thumbnail_url:
-            # Send the same message (including the button) to the log channel
             await context.bot.send_photo(
                 chat_id=LOG_CHANNEL_ID,
                 photo=thumbnail_url,
                 caption=reply_text,
-                reply_markup=reply_markup  # Sending the button
+                reply_markup=reply_markup
             )
         else:
-            # If no thumbnail, send only the text with the button to the log channel
             await context.bot.send_message(
                 chat_id=LOG_CHANNEL_ID,
                 text=reply_text,
-                reply_markup=reply_markup  # Sending the button
+                reply_markup=reply_markup
             )
     else:
         await update.message.reply_text(
@@ -141,10 +160,8 @@ def main():
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, process_link))
 
-    # Start polling
     application.run_polling()
 
 if __name__ == "__main__":
     keep_alive()
     main()
-                 
