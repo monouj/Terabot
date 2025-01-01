@@ -25,7 +25,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Reply with image and button
     await update.message.reply_photo(
         photo=image_url,  # Use an image URL or local file path
-        caption="👋 Hi! Welcome to the bot! Send a Terabox link, and I’ll create a stream link for you.",
+        caption="<b>👋 Hi! Welcome to the bot! Send a Terabox link, and I’ll create a stream link for you.Support Channel :- @AM_UPLOAD</b>",
         reply_markup=reply_markup
     )
 
@@ -94,6 +94,7 @@ async def process_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_text = (
             f"✅ **Here is your stream Link:**\n\n"
             f"📄 **File Name:** {file_name}\n\n"
+            f"By :- @AM_FILMS\n\n"
             f"🔗 Click the button below to open the link."
         )
 
