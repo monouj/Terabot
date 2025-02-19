@@ -6,7 +6,7 @@ import aiohttp  # Using aiohttp for async HTTP requests
 from web import keep_alive
 
 BOT_TOKEN = "7334566762:AAHmhSrMqjAR-9gJOlXzatb0TVorstDQBwk"
-BASE_URL = "https://opabhik.serv00.net/Watch.php?url="
+BASE_URL = "https://terabox-downloader-direct-download-link-generator2.p.rapidapi.com/url="
 TERABOX_PATTERN = r"https?://(?:\w+\.)?(terabox|1024terabox|freeterabox|teraboxapp|tera|teraboxlink|mirrorbox|nephobox|1024tera|momerybox|tibibox|terasharelink|teraboxshare|terafileshare)\.\w+"
 LOG_CHANNEL_ID = "-1002107937108"  # Replace with your actual log channel's username or chat ID
 FSUB_CHANNEL_ID = "-1001940661697"  # Replace with your force subscription channel ID or username
