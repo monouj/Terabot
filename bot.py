@@ -1,3 +1,5 @@
+import requests
+from datetime import datetime
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from bs4 import BeautifulSoup
@@ -5,12 +7,37 @@ import re
 import aiohttp  # Using aiohttp for async HTTP requests
 from web import keep_alive
 
+# API endpoint and credentials
+TERABOX_API_URL = "https://terabox-downloader3.p.rapidapi.com/get-final-response"
+API_HEADERS = {
+    "x-rapidapi-key": "0ec1d5fa9bmsh203fa2fef325774p1bdb48jsnce437790802e",
+    "x-rapidapi-host": "terabox-downloader3.p.rapidapi.com",
+    "Content-Type": "application/json"
+}
+
+# Telegram bot token
 BOT_TOKEN = "7334566762:AAHmhSrMqjAR-9gJOlXzatb0TVorstDQBwk"
 BASE_URL = "https://terabox-downloader-direct-download-link-generator2.p.rapidapi.com/url="
 TERABOX_PATTERN = r"https?://(?:\w+\.)?(terabox|1024terabox|freeterabox|teraboxapp|tera|teraboxlink|mirrorbox|nephobox|1024tera|momerybox|tibibox|terasharelink|teraboxshare|terafileshare)\.\w+"
 LOG_CHANNEL_ID = "-1002107937108"  # Replace with your actual log channel's username or chat ID
 FSUB_CHANNEL_ID = "-1001940661697"  # Replace with your force subscription channel ID or username
 FSubLink = "https://t.me/+NfyWKdRHdsRhNWQ1"  # Replace with your actual channel link
+
+# Current date and time
+current_datetime = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+# Current user's login
+current_user = "monouj"
+
+def get_download_link(url):
+    """Get the download link for a given Terabox URL."""
+    payload = { "url": url }
+    try:
+        print(f"Request initiated by {current_user} at {current_datetime}")
+        response = requests.post(TERABOX_API_URL, json=payload, headers=API_HEADERS)
+        response.raise_for_status()  # Raise an error for bad status codes
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        return {"error": f"An error occurred: {e}"}
 
 async def check_subscription(user_id, bot):
     """Check if a user is a member of the required channel."""
@@ -114,7 +141,12 @@ async def process_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
         MAX_LENGTH = 100
         file_name = file_name[:MAX_LENGTH] + "..." if len(file_name) > MAX_LENGTH else file_name
 
-        new_url = f"{BASE_URL}{user_message}"
+        download_link_response = get_download_link(user_message)
+        if "error" in download_link_response:
+            await update.message.reply_text(f"❌ Error generating download link: {download_link_response['error']}")
+            return
+
+        new_url = download_link_response.get('download_link')
         button = InlineKeyboardButton("🌐 Watch Online", url=new_url)
         reply_markup = InlineKeyboardMarkup([[button]])
 
