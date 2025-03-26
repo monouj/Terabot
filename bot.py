@@ -8,7 +8,7 @@ from web import keep_alive
 BOT_TOKEN = "6880096605:AAGP6---YcXDdPYtYlqrlxRbSmmhrfcMo9c"
 BASE_URL = "https://opabhik.serv00.net/Watch.php?url="
 TERABOX_PATTERN = r"https?://(?:\w+\.)?(terabox|1024terabox|freeterabox|teraboxapp|tera|teraboxlink|mirrorbox|nephobox|1024tera|momerybox|tibibox|terasharelink|teraboxshare|terafileshare)\.\w+"
-LOG_CHANNEL_ID = "-1001564742493"  # Replace with your actual log channel's username or chat ID
+LOG_CHANNEL_ID = "-1002107937108"  # Replace with your actual log channel's username or chat ID
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Start command to welcome the user with an image and button."""
