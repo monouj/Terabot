@@ -10,7 +10,7 @@ BASE_URL = "https://opabhik.serv00.net/Watch.php?url="
 DOWNLOAD_BASE = "https://teradlrobot.cheemsbackup.workers.dev/?url="  
 TERABOX_PATTERN = r"https?://(?:\w+\.)?(terabox|1024terabox|freeterabox|teraboxapp|tera|teraboxlink|mirrorbox|nephobox|1024tera|momerybox|tibibox|terasharelink|teraboxshare|terafileshare)\.\w+"  
 LOG_CHANNEL_ID = "-1002449524486"  # Replace with your actual log channel's ID  
-FSUB_CHANNEL_ID = "-1002574388477"  # Replace with your force subscription channel ID  
+FSUB_CHANNEL_ID = "-1001940661697"  # Replace with your force subscription channel ID  
 FSubLink = "https://t.meam_films"  # Replace with your actual channel link  
 
 async def check_subscription(user_id, bot):  
