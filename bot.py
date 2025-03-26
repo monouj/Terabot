@@ -5,7 +5,7 @@ import re
 import aiohttp  # Using aiohttp for async HTTP requests  
 from web import keep_alive  
 
-BOT_TOKEN = "6880096605:AAGP6---YcXDdPYtYlqrlxRbSmmhrfcMo9c"  
+BOT_TOKEN = "7334566762:AAFTDty0k5zUhKqmy5H24LurCtGqF-OXbK4"  
 BASE_URL = "https://opabhik.serv00.net/Watch.php?url="  
 DOWNLOAD_BASE = "https://teradlrobot.cheemsbackup.workers.dev/?url="  
 TERABOX_PATTERN = r"https?://(?:\w+\.)?(terabox|1024terabox|freeterabox|teraboxapp|tera|teraboxlink|mirrorbox|nephobox|1024tera|momerybox|tibibox|terasharelink|teraboxshare|terafileshare)\.\w+"  
